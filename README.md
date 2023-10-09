@@ -45,12 +45,34 @@ The Alkire-Foster method is a widely used approach for measuring multidimensiona
     - The adjusted headcount ratio (Mo) is computed as the product of H and A.
     - Alternatively, it can be calculated by summing all the 1s in the deprivation matrix (g0) and dividing by the total number of entries (rows * columns), resulting in the mean of the matrix.
 
-## Front-End Interaction
-Starting from step 7, the calculations, particularly the adjustment of the cutoff score (k), should be implemented in the front-end to allow users to explore different poverty thresholds interactively.
 
-Please refer to the Alkire-Foster method documentation and relevant software tools for detailed instructions on implementing this method in your specific application.
+## Input Data
+The input data for the Alkire-Foster method consists of the following components:
 
-For any further inquiries or assistance, please contact our support team.
+### Deprivation Matrix
+The deprivation matrix should contain columns representing dimensions of the study, and it currently supports binary selections (1 for deprivation, 0 for non-deprivation). Here is an example:
 
----
-**Note:** This ReadMe provides a high-level overview of the Alkire-Foster method. For detailed implementation guidelines and code examples, consult the appropriate documentation and resources.
+| Reliant on mobile data | Computer deprived | Handheld device deprived | Utility electricity deprived | Alternative electricity deprived | Electrical lighting deprived |
+|------------------------|-------------------|-------------------------|-----------------------------|---------------------------------|-----------------------------|
+| false                  | false             | false                   | false                       | true                            | false                       |
+| false                  | false             | false                   | false                       | false                           | true                        |
+
+### Weights Matrix
+The weights matrix should contain two columns: "Indicator" and "Weight." The "Indicator" column contains the same names and number as the columns from the deprivation matrix, and the "Weight" column contains the weighting of each dimension. Here is an example:
+
+| Indicator                 | Weight |
+|---------------------------|--------|
+| Reliant on mobile data    | 1      |
+| Computer deprived         | 1      |
+| Handheld device deprived  | 1      |
+
+### Cutoff Vector
+The cutoff vector follows a similar structure as the weights matrix but includes the "Cutoff" column instead of "Weight." Here is an example:
+
+| Indicator                 | Cutoff |
+|---------------------------|--------|
+| Reliant on mobile data    | true   |
+| Computer deprived         | true   |
+| Handheld device deprived  | true   |
+
+Please ensure your input data is structured correctly before applying the Alkire-Foster method calculations.
