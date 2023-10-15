@@ -223,3 +223,33 @@ def calculate_subgroup_data(
         sub_groups_data.append([sub_group_name, sub_group_data])
 
     return sub_groups_data
+
+def calculate_products(subgroup_data):
+    """
+    Calculate products of subgroups based on pre-calculated subgroup data.
+
+    Args:
+        subgroup_data (list): List of pre-calculated subgroup data.
+
+    Returns:
+        dict: A dictionary containing the calculated products for different subgroups.
+    """
+    # Prepare data for product calculation
+    demographics = []
+    for result in subgroup_data:
+        name = result[0]
+        percentages = result[1]
+        for key, value in percentages.items():
+            demographics.append([name, key, value])
+
+    # Calculate products for different subgroups
+    products = {}
+    for i in range(len(demographics)):
+        for j in range(i + 1, len(demographics)):
+            if demographics[i][0] != demographics[j][0]:
+                demograph = demographics[i][0] + "-" + demographics[j][0]
+                names = demographics[i][1] + "-" + demographics[j][1]
+                product = demographics[i][2] * demographics[j][2]
+                products.setdefault(demograph, []).append([names, product])
+
+    return products
