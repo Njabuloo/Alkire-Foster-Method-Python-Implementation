@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import List
+from typing import List, Dict, Union
 
 
 def get_deprivation_matrix(
@@ -253,3 +253,73 @@ def calculate_products(subgroup_data):
                 products.setdefault(demograph, []).append([names, product])
 
     return products
+
+
+def calculate_values(scores: pd.DataFrame, number_of_dimensions: int) -> List[Dict[str, float]]:
+    """
+    Calculate multidimensional poverty values based on the Alkire-Foster method.
+
+    Parameters:
+    - scores (pd.DataFrame): DataFrame containing the scores for each individual across multiple dimensions.
+    - number_of_dimensions (int): The number of dimensions for which the poverty values are calculated.
+
+    Returns:
+    - List[Dict[str, float]]: A list of dictionaries containing the calculated values for each dimension.
+    """
+
+    # Empty list to store values
+    values = []
+
+    for k in range(1, number_of_dimensions):
+        # Get censored vector for the current dimension
+        censored = get_censored_vector(scores, k)
+
+        # Calculate values based on Alkire-Foster method
+        p = len(censored)
+        q = len(censored.loc[censored["Scores"] > 0])
+        H = round(get_head_count_ratio(censored), 2)
+        A = round(get_average_deprivation_score(censored, 9), 2)
+        Mo = round(get_adjusted_head_count_ratio(A, H), 2)
+
+        # Append the calculated values to the list
+        values.append({"p": p, "k": k, "q": q, "H": H, "A": A, "Mo": Mo})
+
+    return values
+
+def calculate_all_subgroup_data(
+    scores: pd.DataFrame, demographics_matrix: pd.DataFrame, number_of_dimensions: int
+) -> List[Dict[str, Dict[str, List[Union[str, float]]]]]:
+    """
+    Calculate subgroup data based on the Alkire-Foster method for multiple dimensions.
+
+    Parameters:
+    - scores (pd.DataFrame): DataFrame containing the scores for each individual across multiple dimensions.
+    - demographics_matrix (pd.DataFrame): DataFrame containing demographic information for each individual.
+    - number_of_dimensions (int): The number of dimensions for which subgroup data is calculated.
+
+    Returns:
+    - List[Dict[str, Dict[str, List[Union[str, float]]]]]: A list of dictionaries containing subgroup data for each dimension.
+
+    """
+
+    sub_group_data = []
+
+    for k in range(1, number_of_dimensions):
+        # Get censored vector for the current dimension
+        censored = get_censored_vector(scores, k)
+
+        # Calculate subgroup data based on demographic information
+        data = calculate_subgroup_data(demographics_matrix, censored)
+
+        # Organize the subgroup data into a dictionary
+        k_dict = dict()
+        for row in data:
+            labels = list(row[1].keys())
+            values = [row[1][label] for label in labels]
+            heading = row[0]
+            k_dict[heading] = {"labels": labels, "data": values}
+
+        # Append the organized subgroup data to the list
+        sub_group_data.append(k_dict)
+
+    return sub_group_data
